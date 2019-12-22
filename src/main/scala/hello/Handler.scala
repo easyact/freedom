@@ -3,7 +3,7 @@ package hello
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import org.apache.logging.log4j.{LogManager, Logger}
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 class Handler extends RequestHandler[Request, Response] {
 
