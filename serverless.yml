@@ -23,6 +23,7 @@ service: freedom
 provider:
   name: aws
   runtime: java8
+  region: ap-southeast-1
 
 # you can overwrite defaults here
 #  stage: dev
@@ -56,7 +57,7 @@ package:
 
 functions:
   hello:
-    handler: hello.Handler
+    handler: hello.ApiGatewayHandler
     events:
       - http:
           path: /
