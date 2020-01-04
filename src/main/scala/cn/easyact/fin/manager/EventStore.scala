@@ -1,9 +1,10 @@
-package manager
+package cn.easyact.fin.manager
 
 import scalaz.Scalaz._
 import scalaz._
 
 import scala.collection.concurrent.TrieMap
+import scala.collection.immutable
 
 trait EventStore[K] {
   def get(key: K): List[Event[_]]

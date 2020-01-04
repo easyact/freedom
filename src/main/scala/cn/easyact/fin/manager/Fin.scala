@@ -1,4 +1,4 @@
-package manager
+package cn.easyact.fin.manager
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, Year, YearMonth}

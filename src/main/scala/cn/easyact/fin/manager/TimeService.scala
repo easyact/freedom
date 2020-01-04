@@ -1,4 +1,4 @@
-package manager
+package cn.easyact.fin.manager
 
 import java.time.{Instant, LocalDate}
 

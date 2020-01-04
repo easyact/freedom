@@ -1,7 +1,10 @@
-import java.time.ZoneId
+package cn.easyact.fin
+
+import java.time.{Instant, LocalDate, ZoneId}
 
 import scalaz.Scalaz._
 import scalaz._
+
 import scala.language.implicitConversions
 
 package object manager {
@@ -11,8 +14,8 @@ package object manager {
   type Amount = BigDecimal
   type Command[A] = Free[Event, A]
 
-  //  val today: LocalDate = LocalDate.now()
-  //  var now: Instant = Instant.now()
+//  val today: LocalDate = LocalDate.now()
+//  var now: Instant = Instant.now()
   val zone: ZoneId = ZoneId.systemDefault()
 
   class Tappable[A](a: A) {

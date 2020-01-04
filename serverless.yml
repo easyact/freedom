@@ -57,7 +57,7 @@ package:
 
 functions:
   manager:
-    handler: manager.ManagerApplication
+    handler: cn.easyact.fin.manager.ManagerApplication
     events:
       - http:
           path: /budget-units

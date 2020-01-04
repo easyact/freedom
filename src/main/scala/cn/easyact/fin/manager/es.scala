@@ -1,9 +1,9 @@
-package manager
+package cn.easyact.fin.manager
 
 import java.time.Instant
 
-import scalaz.Scalaz._
 import scalaz._
+import scalaz.Scalaz._
 import scalaz.concurrent.Task
 
 trait Event[A] {

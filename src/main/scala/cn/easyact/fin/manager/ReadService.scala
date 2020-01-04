@@ -1,4 +1,4 @@
-package manager
+package cn.easyact.fin.manager
 
 import java.time.Instant.now
 import java.time._
@@ -9,6 +9,7 @@ import com.typesafe.scalalogging.Logger
 import scalaz.Scalaz._
 import scalaz._
 import scalaz.concurrent.Task
+
 import scala.collection.mutable
 import scala.language.implicitConversions
 
@@ -32,9 +33,9 @@ trait ReadService {
 
 object MemReadService extends ReadService {
 
-  import BudgetUnitCommands._
   import BudgetUnitSnapshot._
   import MemInterpreter.eventLog._
+  import BudgetUnitCommands._
 
   val log: Logger = Logger[ReadService]
 

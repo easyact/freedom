@@ -1,18 +1,18 @@
-package manager
+package cn.easyact.fin.manager
+
+import java.util.UUID
 
 import com.amazonaws.services.lambda.runtime.events.{APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent}
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 
 class ManagerApplication extends RequestHandler[APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent] {
-  override def handleRequest(input: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent = {
+  override def handleRequest(req: APIGatewayProxyRequestEvent, context: Context): APIGatewayProxyResponseEvent = {
+    val bu = req.getBody()
+//    new ObjectMapper()
+//    BudgetUnitCommands.register(UUID.randomUUID(), bu.)
     val responseEvent = new APIGatewayProxyResponseEvent
-    responseEvent.setBody(dispatch(input))
+    responseEvent.setBody(req.getBody)
     responseEvent
   }
 
-  def dispatch(input: APIGatewayProxyRequestEvent) = (input.getHttpMethod, input.getPath) match {
-    case ("POST", "/budget-units") =>
-      input.getBody
-    case _ => input.getBody
-  }
 }
