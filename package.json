@@ -1,0 +1,19 @@
+{
+  "name": "freedom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "no",
+  "dependencies": {
+    "serverless": "^1.60.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "sls deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git-codecommit.ap-southeast-1.amazonaws.com/v1/repos/freedom"
+  },
+  "author": "",
+  "license": "ISC"
+}
