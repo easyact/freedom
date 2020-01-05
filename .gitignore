@@ -16,3 +16,4 @@ project/plugins/project/
 .serverless
 
 .idea
+node_modules
