@@ -23,10 +23,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
   implicit val time = MockTimeService
 
   import time._
-
-  val readService = MemReadService(MockTimeService)
-
-  import readService._
+  import MemReadService._
 
   private var result: Error \/ List[MonthlyForecast] = _
   private var script: Free[Event, BudgetUnit] = _
