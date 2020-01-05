@@ -21,7 +21,7 @@ elif [ "$1" = "acceptance-test" ] && [ $# -eq 1 ]; then
 elif [ "$1" = "deploy" ] && [ $# -eq 2 ]; then
   STAGE=$2
 
-  sbt package
+  sbt assembly
   npm install
   'node_modules/.bin/sls' deploy -s $STAGE
 else
