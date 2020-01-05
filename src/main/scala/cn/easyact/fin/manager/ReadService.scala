@@ -31,7 +31,9 @@ trait ReadService {
   def forecast(no: AggregateId, numberOfMonths: Int): Error \/ List[MonthlyForecast]
 }
 
-object MemReadService extends ReadService {
+object MemReadService extends MemReadService(TimeService)
+
+case class MemReadService(time: TimeService) extends ReadService {
 
   import BudgetUnitSnapshot._
   import MemInterpreter.eventLog._
@@ -41,8 +43,7 @@ object MemReadService extends ReadService {
 
   override def forecast(no: AggregateId, numberOfMonths: Int): Error \/ List[MonthlyForecast] = {
     import SimulateInterpreter.eventLog
-    //    eventLog.clear()
-    val startMonth = YearMonth.of(Year.now.getValue, 7)
+    val startMonth = YearMonth.from(time.today)
     val endMonth = startMonth.plusMonths(numberOfMonths)
     val eventList: Error \/ List[Event[_]] = events(no)
     for {
@@ -156,14 +157,17 @@ object MemInterpreter extends Interpreter[BudgetUnit] {
 }
 
 object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
-  override def updateState(initial: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = e match {
-    case Registered(no, name, s, b) => initial + (no -> BudgetUnit(no, name, s.get))
+  val log: Logger = Logger[Snapshot[BudgetUnit]]
+
+  override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = e match {
+    case Registered(no, name, s, b) => state + (no -> BudgetUnit(no, name, s.get))
     case Earned(no, amount, _, _) =>
-      val bu = initial(no)
-      initial + (no -> bu.copy(balance = bu.balance + amount))
+      log.info("No.{}. Current state is: {}", no, state)
+      val bu = state(no)
+      state + (no -> bu.copy(balance = bu.balance + amount))
     case ItemAdded(no, i, _) =>
-      val bu = initial(no)
-      initial + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
+      val bu = state(no)
+      state + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
   }
 }
 

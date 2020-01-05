@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, LocalTime, YearMonth}
 import java.util
 
-import cn.easyact.fin.manager.MemReadService._
 import io.cucumber.java.zh_cn.{假设, 当, 那么}
 import io.cucumber.java.{Before, _}
 import org.assertj.core.api.Assertions.assertThat
@@ -21,8 +20,13 @@ object MockTimeService extends TimeService {
 }
 
 class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
+  implicit val time = MockTimeService
 
-  import cn.easyact.fin.manager.MockTimeService._
+  import time._
+
+  val readService = MemReadService(MockTimeService)
+
+  import readService._
 
   private var result: Error \/ List[MonthlyForecast] = _
   private var script: Free[Event, BudgetUnit] = _
@@ -31,7 +35,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
   def setInterpreter(): Unit = {
     MemInterpreter.eventLog.clear()
     SimulateInterpreter.eventLog.clear()
-    log.info("Cleared {}, {}", MemInterpreter.eventLog, SimulateInterpreter.eventLog)
+    //    log.info("Cleared {}, {}", MemInterpreter.eventLog, SimulateInterpreter.eventLog)
   }
 
   @假设("{string}开了户") def 张三在号开了户(name: String): Unit = {

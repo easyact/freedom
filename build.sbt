@@ -21,7 +21,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "io.cucumber" % "cucumber-java" % "5.0.0-RC4" % Test
 libraryDependencies += "org.assertj" % "assertj-core" % "3.14.0" % Test
-
+libraryDependencies += "org.specs2" %% "specs2-core" % "4.8.1" % Test
+libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.0-alpha1" % Test
 
 scalacOptions ++= Seq(
   "-unchecked",

@@ -6,8 +6,8 @@ import java.time.{LocalDate, Year, YearMonth}
 case class MonthlyForecast(month: YearMonth, balance: Amount)
 
 object MonthlyForecast {
-  def apply(month: Int, balance: Amount): MonthlyForecast =
-    MonthlyForecast(YearMonth.of(Year.now.getValue, month), balance)
+  def apply(month: Int, balance: Amount)(implicit time:TimeService): MonthlyForecast =
+    MonthlyForecast(YearMonth.of(time.today.getYear, month), balance)
 }
 
 case class BudgetUnit(no: String, name: String, start: LocalDate, balance: Amount = 0,
