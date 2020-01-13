@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.0",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
   "org.scalaz" %% "scalaz-concurrent" % "7.3.0-M27",
-  "com.typesafe.scala-logging" % "scala-logging_2.12" % "3.9.2",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.10.1"
 )
 
