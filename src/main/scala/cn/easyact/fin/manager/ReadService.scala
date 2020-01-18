@@ -50,7 +50,7 @@ object MemReadService extends ReadService {
         eventLog.put(t._1, t._2)
       }.right
     } yield ()
-    log.info("Added result: {}", eventLog)
+    log.debug("Added result: {}", eventLog)
 
     //    eventList foreach {
     //      _.map(e => (e.at, UUID.randomUUID()) -> e)
@@ -68,7 +68,7 @@ object MemReadService extends ReadService {
     bu.map(_.budgetItems.map(simulateScript(no, endMonth)))
       .map(_.fold(Free.point[Event, BudgetUnit](null))((f, f1) => f.flatMap(_ => f1)))
       .foreach(SimulateInterpreter(_).unsafePerformSync)
-    log.info("EventLog is {}", eventLog)
+    log.debug("EventLog is {}", eventLog)
     val groups: Map[YearMonth, List[Event[_]]] = eventLog
       .groupBy(tuple => YearMonth.from(tuple._1._1.atZone(zone)))
       .mapValues(_.values.toList)
@@ -160,7 +160,7 @@ object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
   override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = e match {
     case Registered(no, name, s, b) => state + (no -> BudgetUnit(no, name, s.get))
     case Earned(no, amount, _, _) =>
-      log.info("No.{}. Current state is: {}", no, state)
+      log.debug("No.{}. Current state is: {}", no, state)
       val bu = state(no)
       state + (no -> bu.copy(balance = bu.balance + amount))
     case ItemAdded(no, i, _) =>

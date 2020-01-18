@@ -7,4 +7,5 @@ phases:
   build:
     commands:
       - chmod +x build.sh
+      - ./build.sh int
       - ./build.sh deploy dev
