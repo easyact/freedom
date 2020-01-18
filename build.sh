@@ -17,7 +17,7 @@ if [ $# -eq 0 ]; then
 elif [ "$1" = "int" ] && [ $# -eq 1 ]; then
   sbt cucumber
 elif [ "$1" = "at" ] && [ $# -eq 1 ]; then
-  sbt acceptance-test
+  sbt it
 elif [ "$1" = "deploy" ] && [ $# -eq 2 ]; then
   STAGE=$2
 

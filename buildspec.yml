@@ -9,4 +9,4 @@ phases:
       - chmod +x build.sh
       - ./build.sh int
       - ./build.sh deploy dev
-      - ./build.sh at
+#      - ./build.sh at
