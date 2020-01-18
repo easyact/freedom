@@ -16,6 +16,7 @@ if [ $# -eq 0 ]; then
   exit 1
 elif [ "$1" = "int" ] && [ $# -eq 1 ]; then
   sbt test
+  sbt cucumber
 elif [ "$1" = "acceptance-test" ] && [ $# -eq 1 ]; then
   sbt acceptance-test
 elif [ "$1" = "deploy" ] && [ $# -eq 2 ]; then
