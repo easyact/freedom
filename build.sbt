@@ -49,8 +49,8 @@ mainClass in(Compile, run) := Some("cucumber.api.cli.Main")
 
 lazy val cucumber = taskKey[Unit]("cucumber")
 cucumber := Def.taskDyn {
-  val arg = "arg1"
-  val args = List("--plugin", "pretty", "--glue", "cn.easyact.fin.manager", "src/test/resources")
+  val args = List("-m", "--plugin", "pretty", "--glue", "cn.easyact.fin.manager"
+    , "src/test/resources")
     .mkString(" ")
   Def.task {
     (runMain in Test).toTask(s" cucumber.api.cli.Main $args").value
