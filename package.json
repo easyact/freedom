@@ -4,7 +4,8 @@
   "description": "",
   "main": "no",
   "dependencies": {
-    "serverless": "^1.60.5"
+    "serverless": "^1.60.5",
+    "serverless-sam": "^0.2.0"
   },
   "devDependencies": {},
   "scripts": {
