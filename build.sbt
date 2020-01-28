@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
   "org.scalaz" %% "scalaz-concurrent" % "7.3.0-M27",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-  "com.fasterxml.jackson.core" % "jackson-core" % "2.10.1"
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.10.1"
 )
 
 libraryDependencies += "io.cucumber" % "cucumber-java" % "5.0.0-RC4" % Test
