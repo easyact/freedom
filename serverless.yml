@@ -24,7 +24,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: java8
+  runtime: java11
   region: ap-southeast-1
 
 # you can overwrite defaults here
