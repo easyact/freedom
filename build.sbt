@@ -1,8 +1,6 @@
 import sbtassembly.Log4j2MergeStrategy
 import sbtrelease.Version
 
-import scala.sys.process.Process
-
 name := "freedom"
 
 resolvers += Resolver.sonatypeRepo("public")
@@ -56,3 +54,13 @@ cucumber := Def.taskDyn {
     (runMain in Test).toTask(s" cucumber.api.cli.Main $args").value
   }
 }.value
+
+javacOptions ++= Seq("-source", "12", "-target", "11")
+scalacOptions += "-target:jvm-1.8"
+//scalacOptions += "--release 9"
+assemblyMergeStrategy in assembly := {
+  case "module-info.class" => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}

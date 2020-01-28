@@ -6,7 +6,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: cn.easyact.fin.controllers.hello.BuHandler
-      Runtime: java8
+      Runtime: java11
       CodeUri: target/scala-2.12/hello.jar
       MemorySize: 128
       Timeout: 3
@@ -59,7 +59,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: hello.ApiGatewayHandler
-      Runtime: java8
+      Runtime: java11
       CodeUri: target/scala-2.12/hello.jar
       MemorySize: 128
       Timeout: 3
