@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'SAM template for Serverless framework service: '
+Resources:
+  FreedomDevManager:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: cn.easyact.fin.controllers.hello.BuHandler
+      Runtime: java8
+      CodeUri: target/scala-2.12/hello.jar
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        Event1:
+          Type: Api
+          Properties:
+            Path: /budget-units
+            Method: post
+            RestApiId:
+              Ref: Freedom
+  Freedom:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: dev
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title:
+            Ref: 'AWS::StackName'
+        paths:
+          /budget-units:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  'Fn::Sub': >-
+                    arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FreedomDevManager.Arn}/invocations
+              responses: {}
+          /:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  'Fn::Sub': >-
+                    arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FreedomDevHello.Arn}/invocations
+              responses: {}
+  FreedomDevManagerLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    DependsOn:
+      - FreedomDevManager
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName:
+        Ref: FreedomDevManager
+      Principal: apigateway.amazonaws.com
+  FreedomDevHello:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: hello.ApiGatewayHandler
+      Runtime: java8
+      CodeUri: target/scala-2.12/hello.jar
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        Event1:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+            RestApiId:
+              Ref: Freedom
+  FreedomDevHelloLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    DependsOn:
+      - FreedomDevHello
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName:
+        Ref: FreedomDevHello
+      Principal: apigateway.amazonaws.com
