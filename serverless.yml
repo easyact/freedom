@@ -51,13 +51,22 @@ functions:
       - http:
           path: /budget-units
           method: post
-      - http: GET /budget-units
-  hello:
-    handler: hello.ApiGatewayHandler
-    events:
       - http:
-          path: /
+          path: /budget-units/{no}/forecast/{unit}/{count}
           method: get
+          request:
+            parameters:
+              paths:
+                no: true
+                unit: true
+                count: true
+      - http: GET /budget-units
+#  hello:
+#    handler: hello.ApiGatewayHandler
+#    events:
+#      - http:
+#          path: /
+#          method: get
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
