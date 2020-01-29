@@ -4,6 +4,7 @@ import java.time.Instant.now
 import java.time._
 import java.time.temporal.ChronoUnit.MONTHS
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 import com.typesafe.scalalogging.Logger
 import scalaz.Scalaz._
@@ -46,7 +47,7 @@ object MemReadService extends ReadService {
     val eventList: Error \/ List[Event[_]] = events(no)
     for {
       l <- eventList
-      _ <- l.map(e => (e.at, UUID.randomUUID()) -> e).foreach { t =>
+      _ <- l.map(e => (e.at, randomUUID()) -> e).foreach { t =>
         eventLog.put(t._1, t._2)
       }.right
     } yield ()
@@ -176,7 +177,7 @@ object SimulateInterpreter extends Interpreter[BudgetUnit] {
     override def apply[A](e: Event[A]): Task[A] =
       e match {
         case event: BudgetUnitEvent => Task {
-          eventLog((e.at, UUID.randomUUID())) = event
+          eventLog((e.at, randomUUID())) = event
           null
         }
         case _ => throw new RuntimeException("不支持的解释步骤")
