@@ -15,17 +15,18 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
 
   val logger: Logger = LogManager.getLogger(getClass)
 
-  val mapper = new ObjectMapper()
+  val mapper = new ObjectMapper
+  import mapper._
 
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
     logger.info(s"Received a request: $in")
     val sBu = in.getBody
-    val bu = mapper.readValue(sBu, classOf[BU])
+    val bu = readValue(sBu, classOf[BU])
     val name = bu.name
     val id = randomUUID.toString
     val script = register(id, name, Some(LocalDate now()))
     MemInterpreter(script)
-    val body = mapper.writeValueAsString(BU(id, name))
+    val body = writeValueAsString(BU(id, name))
     BuResponse(200, body)
   }
 }
