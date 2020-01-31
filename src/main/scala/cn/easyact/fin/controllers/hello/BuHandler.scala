@@ -17,7 +17,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
 
   val logger: Logger = LogManager.getLogger(getClass)
 
-  val mapper = new ObjectMapper with ScalaObjectMapper
+  val mapper = new ObjectMapper //with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
 
   import BudgetUnitSnapshot._
