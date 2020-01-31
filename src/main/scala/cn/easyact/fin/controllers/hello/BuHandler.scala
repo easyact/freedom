@@ -5,13 +5,14 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{BudgetUnitSnapshot, MemInterpreter, MemReadService, TimeService}
+import cn.easyact.fin.manager.{BudgetItem, BudgetUnit, BudgetUnitSnapshot, Command, Event, MemInterpreter, MemReadService, TimeService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.logging.log4j.{LogManager, Logger}
+import scalaz.Free
 
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
@@ -46,6 +47,25 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       m => m
     )
 
+    def items(p: util.Map[String, String]) = {
+      val sBu = in.getBody
+      val dto = readValue(sBu, classOf[Items])
+      val no = p.get("no")
+      val zero = Free.liftF[Event, BudgetUnit](null)
+
+      def compose(zero: Command[BudgetUnit], items: List[BudgetItem]) = {
+        items.foldLeft(zero) { (s, item) =>
+          s >>= (_ => addItem(no, item))
+        }
+      }
+
+      val incomeScript = compose(zero, dto.incomes)
+      val script = compose(incomeScript, dto.expenses)
+      val task = MemInterpreter(script)
+      val bu = task.unsafePerformSync
+      bu
+    }
+
     def forecast(p: util.Map[String, String]) =
       MemReadService.forecast(p.get("no"), p.get("count").toInt).fold(
         e => throw new RuntimeException(e),
@@ -58,6 +78,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
         case p => forecast(p)
       }
       case "POST" => post
+      case "PUT" => items(in.getPathParameters)
     }
     BuResponse(200, writeValueAsString(body))
   }
