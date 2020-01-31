@@ -38,8 +38,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val id = randomUUID.toString
       val script = register(id, name, Some(LocalDate now()))
       val task = MemInterpreter(script)
-      val bu = task.unsafePerformSync
-      bu
+      task.unsafePerformSync
     }
 
     def get = allEvents.flatMap(snapshot).fold(
@@ -62,8 +61,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val incomeScript = compose(zero, dto.incomes)
       val script = compose(incomeScript, dto.expenses)
       val task = MemInterpreter(script)
-      val bu = task.unsafePerformSync
-      bu
+      task.unsafePerformSync
     }
 
     def forecast(p: util.Map[String, String]) =
