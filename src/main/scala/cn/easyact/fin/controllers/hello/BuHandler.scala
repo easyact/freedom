@@ -10,9 +10,10 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.logging.log4j.{LogManager, Logger}
 import scalaz.Free
+
+import scala.collection.JavaConverters._
 
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
@@ -58,8 +59,8 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
         }
       }
 
-      val incomeScript = compose(zero, dto.incomes)
-      val script = compose(incomeScript, dto.expenses)
+      val incomeScript = compose(zero, dto.incomes.asScala.toList)
+      val script = compose(incomeScript, dto.expenses.asScala.toList)
       val task = MemInterpreter(script)
       task.unsafePerformSync
     }
