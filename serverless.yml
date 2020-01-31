@@ -49,9 +49,11 @@ functions:
     handler: cn.easyact.fin.controllers.hello.BuHandler
     events:
       - http:
+          cors: true
           path: /budget-units
           method: post
       - http:
+          cors: true
           path: /budget-units/{no}/forecast/{unit}/{count}
           method: get
           request:
@@ -60,7 +62,10 @@ functions:
                 no: true
                 unit: true
                 count: true
-      - http: GET /budget-units
+      - http:
+          cors: true
+          path: /budget-units
+          method: get
 #  hello:
 #    handler: hello.ApiGatewayHandler
 #    events:
