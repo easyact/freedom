@@ -52,12 +52,10 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val dto = readValue(sBu, classOf[Items])
       val no = p.get("no")
 
-      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
-        s.flatMap(_ => s1)
-      }
-      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
-        s >>= (_ => addItem(no, item))
-      }
+      val script = (dto.incomes.map(Income(_)) :: dto.expenses.map(Expense(_))).asInstanceOf[List[BudgetItem]]
+        .map(addItem(no, _))
+        .reduceLeft((b, a) => b.flatMap(_ => a))
+
       val task = MemInterpreter(script)
       task.unsafePerformSync
     }
