@@ -5,17 +5,12 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{BudgetItem, BudgetUnit, BudgetUnitSnapshot, Command, Event, Expense, Income, MemInterpreter, MemReadService, TimeService}
+import cn.easyact.fin.manager.{BudgetUnit, BudgetUnitSnapshot, Command, Expense, Income, MemInterpreter, MemReadService, TimeService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import org.apache.logging.log4j.simple.SimpleLogger
 import org.apache.logging.log4j.{LogManager, Logger}
-import org.slf4j.LoggerFactory
-import scalaz.Free
-
-import scala.collection.JavaConverters._
 
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
@@ -54,10 +49,12 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val dto = readValue(sBu, classOf[Items])
       val no = p.get("no")
 
-      val script = (dto.incomes.map(Income(_)) :: dto.expenses.map(Expense(_))).asInstanceOf[List[BudgetItem]]
-        .map(addItem(no, _))
-        .reduceLeft((b, a) => b.flatMap(_ => a))
-
+      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
+        s.flatMap(_ => s1)
+      }
+      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
+        s >>= (_ => addItem(no, item))
+      }
       val task = MemInterpreter(script)
       task.unsafePerformSync
     }
