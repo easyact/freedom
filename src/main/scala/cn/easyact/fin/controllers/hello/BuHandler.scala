@@ -10,7 +10,9 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import org.apache.logging.log4j.simple.SimpleLogger
 import org.apache.logging.log4j.{LogManager, Logger}
+import org.slf4j.LoggerFactory
 import scalaz.Free
 
 import scala.collection.JavaConverters._
@@ -66,6 +68,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
         r => r
       )
 
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG")
     val body = in.getHttpMethod match {
       case "GET" => in.getPathParameters match {
         case null => get
