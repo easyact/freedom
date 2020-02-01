@@ -7,6 +7,7 @@ import java.util.UUID
 import java.util.UUID.randomUUID
 
 import com.typesafe.scalalogging.Logger
+import org.apache.logging.log4j.LogManager
 import scalaz.Scalaz._
 import scalaz._
 import scalaz.concurrent.Task
@@ -156,17 +157,20 @@ object MemInterpreter extends Interpreter[BudgetUnit] {
 }
 
 object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
-  val log: Logger = Logger[Snapshot[BudgetUnit]]
+  val log: Logger = LogManager.getLogger(getClass)
 
-  override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = e match {
-    case Registered(no, name, s, b) => state + (no -> BudgetUnit(no, name, s.get))
-    case Earned(no, amount, _, _) =>
-      log.debug("No.{}. Current state is: {}", no, state)
-      val bu = state(no)
-      state + (no -> bu.copy(balance = bu.balance + amount))
-    case ItemAdded(no, i, _) =>
-      val bu = state(no)
-      state + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
+  override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = {
+    log.info(s"updating state: $state. Event: $e")
+    e match {
+      case Registered(no, name, s, b) =>
+        state + (no -> BudgetUnit(no, name, s.get))
+      case Earned(no, amount, _, _) =>
+        val bu = state(no)
+        state + (no -> bu.copy(balance = bu.balance + amount))
+      case ItemAdded(no, i, _) =>
+        val bu = state(no)
+        state + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
+    }
   }
 }
 
