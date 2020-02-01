@@ -51,16 +51,13 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val sBu = in.getBody
       val dto = readValue(sBu, classOf[Items])
       val no = p.get("no")
-      val zero = Free.liftF[Event, BudgetUnit](null)
 
-      def compose(zero: Command[BudgetUnit], items: List[BudgetItem]) = {
-        items.foldLeft(zero) { (s, item) =>
-          s >>= (_ => addItem(no, item))
-        }
+      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
+        s.flatMap(_ => s1)
       }
-
-      val incomeScript = compose(zero, dto.incomes.map(Income(_)))
-      val script = compose(incomeScript, dto.expenses.map(Expense(_)))
+      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
+        s >>= (_ => addItem(no, item))
+      }
       val task = MemInterpreter(script)
       task.unsafePerformSync
     }
