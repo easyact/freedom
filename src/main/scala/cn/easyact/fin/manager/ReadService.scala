@@ -149,7 +149,7 @@ object MemInterpreter extends Interpreter[BudgetUnit] {
             m => m(no)
           )
       }
-      case _ => throw new RuntimeException("不支持的解释步骤")
+      case _ => throw new RuntimeException(s"不支持的解释步骤: ${e}")
     }
   }
 
