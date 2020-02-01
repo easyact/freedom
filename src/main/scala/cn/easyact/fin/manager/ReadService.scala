@@ -7,7 +7,6 @@ import java.util.UUID
 import java.util.UUID.randomUUID
 
 import com.typesafe.scalalogging.Logger
-import org.apache.logging.log4j.LogManager
 import scalaz.Scalaz._
 import scalaz._
 import scalaz.concurrent.Task
@@ -35,9 +34,9 @@ trait ReadService {
 
 object MemReadService extends ReadService {
 
+  import BudgetUnitCommands._
   import BudgetUnitSnapshot._
   import MemInterpreter.eventLog._
-  import BudgetUnitCommands._
 
   val log: Logger = Logger[ReadService]
 
@@ -150,14 +149,14 @@ object MemInterpreter extends Interpreter[BudgetUnit] {
             m => m(no)
           )
       }
-      case _ => throw new RuntimeException(s"不支持的解释步骤: ${e}")
+      case _ => throw new RuntimeException(s"不支持的解释步骤: $e")
     }
   }
 
 }
 
 object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
-  val log: Logger = LogManager.getLogger(getClass)
+  val log: Logger = Logger[Snapshot[BudgetUnit]]
 
   override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = {
     log.info(s"updating state: $state. Event: $e")
