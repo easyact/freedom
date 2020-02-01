@@ -32,10 +32,6 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings"
 )
 
-//val cucumber = taskKey[String]("cucumber")
-//
-//cucumber := Process(s"java ")
-
 mainClass in(Compile, run) := Some("cucumber.api.cli.Main")
 
 lazy val cucumber = taskKey[Unit]("cucumber")
@@ -48,7 +44,7 @@ cucumber := Def.taskDyn {
   }
 }.value
 
-javacOptions ++= Seq("-source", "12", "-target", "11")
+javacOptions ++= Seq("-source", "12", "-target", "8")
 scalacOptions += "-target:jvm-1.8"
 //scalacOptions += "--release 9"
 assemblyMergeStrategy in assembly := {
