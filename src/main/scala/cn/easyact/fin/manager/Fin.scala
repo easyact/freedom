@@ -1,7 +1,8 @@
 package cn.easyact.fin.manager
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, Year, YearMonth}
+import java.time.{LocalDate, YearMonth}
+import java.util
 
 case class MonthlyForecast(month: YearMonth, balance: Amount)
 
@@ -27,7 +28,7 @@ sealed trait Expense extends BudgetItem
 trait Factory[T <: BudgetItem] {
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMM")
 
-  def apply(map: java.util.Map[String, String]): T =
+  def apply(map: util.Map[String, String]): T =
     apply(map.get("项目"), map.get("数额").toDouble, map.get("月周期").toInt, map.get("开始月份"))
 
   def apply(t: String, amount: Amount, intervalMonth: Int, startMonth: String): T = {

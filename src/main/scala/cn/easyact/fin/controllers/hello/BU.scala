@@ -10,4 +10,4 @@ case class BU(@BeanProperty no: String, @BeanProperty name: String) {
   override def toString: String = s"BU($no, $name)"
 }
 
-case class Items(incomes: util.List[Income], expenses: util.List[Expense])
+case class Items(incomes: List[util.Map[String, String]], expenses: List[util.Map[String, String]])

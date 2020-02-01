@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{BudgetItem, BudgetUnit, BudgetUnitSnapshot, Command, Event, MemInterpreter, MemReadService, TimeService}
+import cn.easyact.fin.manager.{BudgetItem, BudgetUnit, BudgetUnitSnapshot, Command, Event, Expense, Income, MemInterpreter, MemReadService, TimeService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -59,8 +59,8 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
         }
       }
 
-      val incomeScript = compose(zero, dto.incomes.asScala.toList)
-      val script = compose(incomeScript, dto.expenses.asScala.toList)
+      val incomeScript = compose(zero, dto.incomes.map(Income(_)))
+      val script = compose(incomeScript, dto.expenses.map(Expense(_)))
       val task = MemInterpreter(script)
       task.unsafePerformSync
     }
