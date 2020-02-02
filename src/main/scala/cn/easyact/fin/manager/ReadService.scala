@@ -98,9 +98,7 @@ object MemReadService extends ReadService {
         .map(startMonth.plusMonths)
         .map(_.atDay(1).atStartOfDay(zone).toInstant)
         .map(earn(no, item, _))
-        .fold(Free.point[Event, BudgetUnit](null)) {
-          (f: Command[BudgetUnit], f1: Command[BudgetUnit]) => f.flatMap(_ => f1)
-        }
+        .reduceLeft { (script, command) => script.flatMap(_ => command) }
     }
   }
 }

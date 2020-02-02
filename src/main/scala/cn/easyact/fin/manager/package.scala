@@ -1,7 +1,8 @@
 package cn.easyact.fin
 
-import java.time.{Instant, LocalDate, ZoneId}
+import java.time.ZoneId
 
+import com.typesafe.scalalogging.Logger
 import scalaz.Scalaz._
 import scalaz._
 
@@ -14,9 +15,9 @@ package object manager {
   type Amount = BigDecimal
   type Command[A] = Free[Event, A]
 
-//  val today: LocalDate = LocalDate.now()
-//  var now: Instant = Instant.now()
   val zone: ZoneId = ZoneId.systemDefault()
+
+  Logger[ZoneId].info(s"当前时区: $zone")
 
   class Tappable[A](a: A) {
     def tap(action: A => Unit): A = {

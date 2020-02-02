@@ -52,7 +52,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
   }
 
   @假设("当前月为{string}") def 当前月为(string: String): Unit = {
-    MockTimeService._today = YearMonth.parse(string, DateTimeFormatter.ofPattern("uuuuMM")).atDay(1)
+    MockTimeService._today = YearMonth.parse(string, DateTimeFormatter.ofPattern("uuuuMM")).atDay(2)
   }
 
   @假设("当前存款为{amount}") def 当前存款为(amount: Amount): Unit = {
