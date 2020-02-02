@@ -67,7 +67,7 @@ object MemReadService extends ReadService {
     } yield s(no)
 
     bu.map(_.budgetItems.map(simulateScript(no, endMonth)))
-      .map(_.fold(Free.point[Event, BudgetUnit](null))((f, f1) => f.flatMap(_ => f1)))
+      .map(_ reduceLeft { (script, command) => script.flatMap(_ => command) })
       .foreach(SimulateInterpreter(_).unsafePerformSync)
     log.debug("EventLog is {}", eventLog)
     val groups: Map[YearMonth, List[Event[_]]] = eventLog
