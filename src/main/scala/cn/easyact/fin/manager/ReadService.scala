@@ -42,6 +42,7 @@ object MemReadService extends ReadService {
 
   override def forecast(no: AggregateId, numberOfMonths: Int)(implicit time: TimeService): Error \/ List[MonthlyForecast] = {
     import SimulateInterpreter.eventLog
+    eventLog.clear()
     val startMonth = YearMonth.from(time.today)
     val endMonth = startMonth.plusMonths(numberOfMonths)
     val eventList: Error \/ List[Event[_]] = events(no)
