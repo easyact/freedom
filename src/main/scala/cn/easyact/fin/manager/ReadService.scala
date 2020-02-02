@@ -78,7 +78,7 @@ object MemReadService extends ReadService {
       .map(n => startMonth.plusMonths(n) -> (0 to n)
         .map(startMonth.plusMonths(_))
         .map(groups(_))
-        .fold(Nil)(_ ++ _))
+        .reduceLeft(_ ++ _))
       .foldLeft(List[MonthlyForecast]()) {
         (list: List[MonthlyForecast], t) =>
           val b = t._2.right
@@ -162,8 +162,13 @@ object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
       case Registered(no, name, s, b) =>
         state + (no -> BudgetUnit(no, name, s.get))
       case Earned(no, amount, _, _) =>
-        val bu = state(no)
-        state + (no -> bu.copy(balance = bu.balance + amount))
+        state.get(no) match {
+          case None =>
+            log.error(s"针对不存在的账户操作: $no")
+            state
+          case Some(bu) =>
+            state + (no -> bu.copy(balance = bu.balance + amount))
+        }
       case ItemAdded(no, i, _) =>
         val bu = state(no)
         state + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
