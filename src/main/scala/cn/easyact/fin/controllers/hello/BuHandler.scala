@@ -10,11 +10,11 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import org.apache.logging.log4j.{LogManager, Logger}
+import com.typesafe.scalalogging.Logger
 
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
-  val logger: Logger = LogManager.getLogger(getClass)
+  val logger: Logger = Logger[BuHandler]
 
   val mapper = new ObjectMapper //with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
