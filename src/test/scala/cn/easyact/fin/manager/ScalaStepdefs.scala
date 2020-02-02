@@ -12,7 +12,7 @@ import scalaz.{Free, \/}
 import scala.collection.JavaConverters._
 
 object MockTimeService extends TimeService {
-  var _today = LocalDate.now
+  var _today: LocalDate = LocalDate.now
 
   override def now: Instant = _today.atTime(LocalTime.now).atZone(zone).toInstant
 
@@ -20,7 +20,7 @@ object MockTimeService extends TimeService {
 }
 
 class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
-  implicit val time = MockTimeService
+  implicit val time: TimeService = MockTimeService
 
   import time._
   import MemReadService._
@@ -36,9 +36,9 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
     //    log.info("Cleared {}, {}", MemInterpreter.eventLog, SimulateInterpreter.eventLog)
   }
 
-  @假设("{string}开了户") def 张三在号开了户(name: String): Unit = {
+  @假设("{string}开了户") def 开了户(name: String): Unit = {
     val script = register(name, name, Some(today), now)
-    perform(script)
+    no = perform(script).no
   }
 
   @假设("月收入:") def 月收入(incomes: util.List[Income]): Unit = {
