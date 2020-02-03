@@ -3,11 +3,13 @@ package cn.easyact.fin.manager
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDate, YearMonth}
 import java.util
+import java.util.UUID
+import java.util.UUID.randomUUID
 
 case class MonthlyForecast(month: YearMonth, balance: Amount)
 
 object MonthlyForecast {
-  def apply(month: Int, balance: Amount)(implicit time:TimeService): MonthlyForecast =
+  def apply(month: Int, balance: Amount)(implicit time: TimeService): MonthlyForecast =
     MonthlyForecast(YearMonth.of(time.today.getYear, month), balance)
 }
 
@@ -15,6 +17,7 @@ case class BudgetUnit(no: String, name: String, start: LocalDate, balance: Amoun
                       budgetItems: List[BudgetItem] = List.empty) extends Aggregate
 
 sealed trait BudgetItem {
+  val id: UUID
   val t: String
   val amount: Amount
   val intervalMonth: Int
@@ -29,36 +32,42 @@ trait Factory[T <: BudgetItem] {
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMM")
 
   def apply(map: util.Map[String, String]): T =
-    apply(map.get("项目"), map.get("数额").toDouble, map.get("月周期").toInt, map.get("开始月份"))
+    apply(map.get("id"), map.get("项目"), map.get("数额").toDouble, map.get("月周期").toInt, map.get("开始月份"))
 
-  def apply(t: String, amount: Amount, intervalMonth: Int, startMonth: String): T = {
+  def apply(id: String, t: String, amount: Amount, intervalMonth: Int, startMonth: String): T = {
     val start = YearMonth.parse(startMonth, formatter)
-    apply(t, amount, intervalMonth, start)
+    apply(id, t, amount, intervalMonth, start)
   }
 
-  def apply(t: String, amount: Amount, intervalMonth: Int, start: YearMonth): T =
-    apply(t, amount, intervalMonth, start.atEndOfMonth())
+  def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: YearMonth): T =
+    apply(id, t, amount, intervalMonth, start.atEndOfMonth())
 
-  def apply(t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T
+  def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T =
+    apply(Option(id).map(UUID.fromString).getOrElse(randomUUID), t, amount, intervalMonth, start)
+  def apply(id: UUID, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T
 }
 
 object Income extends Factory[Income] {
-  override def apply(t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Income = t match {
-    case "工资" => Salary(amount, intervalMonth, start)
-    case _ => OtherIncome(amount, intervalMonth, start, t)
+  override def apply(id: UUID, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Income = {
+    t match {
+      case "工资" => Salary(id, amount, intervalMonth, start)
+      case _ => OtherIncome(id, amount, intervalMonth, start, t)
+    }
   }
 }
 
 object Expense extends Factory[Expense] {
-  def apply(t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Expense = t match {
-    case _ => OtherExpense(amount, intervalMonth, start, t)
+  def apply(id:UUID ,t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Expense = {
+    t match {
+      case _ => OtherExpense(id, amount, intervalMonth, start, t)
+    }
   }
 }
 
-case class Salary(amount: Amount, intervalMonth: Int, start: LocalDate) extends Income {
-  override val t: String = "salary"
+case class Salary(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate) extends Income {
+  override val t: String = "工资"
 }
 
-case class OtherIncome(amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Income
+case class OtherIncome(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Income
 
-case class OtherExpense(amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Expense
+case class OtherExpense(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Expense

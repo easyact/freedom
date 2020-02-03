@@ -30,7 +30,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
     logger.info(s"Received a request: $in")
     logger.info(s"getPathParameters: ${in.getPathParameters}")
-    Try(process(in)).map(writeValueAsString(_)).fold(BuResponse(500, _), BuResponse(200, _))
+    Try(process(in)).map(writeValueAsString(_)).fold(e => BuResponse(500, writeValueAsString(e)), BuResponse(200, _))
   }
 
   private def process(in: APIGatewayProxyRequestEvent) = {
