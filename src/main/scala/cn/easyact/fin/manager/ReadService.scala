@@ -172,7 +172,7 @@ object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
         }
       case ItemAdded(no, i, _) =>
         val bu = state(no)
-        state + (no -> bu.copy(budgetItems = bu.budgetItems :+ i))
+        state + (no -> bu.copy(budgetItems = bu.budgetItems.filterNot(_.id == i.id) :+ i))
     }
   }
 }
