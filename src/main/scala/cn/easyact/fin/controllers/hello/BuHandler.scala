@@ -65,7 +65,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
         r => r
       )
 
-//    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG")
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "INFO")
     val body = in.getHttpMethod match {
       case "GET" => in.getPathParameters match {
         case null => get

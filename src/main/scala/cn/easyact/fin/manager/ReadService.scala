@@ -158,7 +158,7 @@ object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
   val log: Logger = Logger[Snapshot[BudgetUnit]]
 
   override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = {
-    log.info(s"updating state: $state. Event: $e")
+    log.debug(s"updating state: $state. Event: $e")
     e match {
       case Registered(no, name, s, b) =>
         state + (no -> BudgetUnit(no, name, s.get))
