@@ -97,7 +97,7 @@ object MemReadService extends ReadService {
       val months = startMonth.until(endMonth, MONTHS)
       (0L to(months, item.intervalMonth))
         .map(startMonth.plusMonths)
-        .map(_.atEndOfMonth.atStartOfDay(zone).toInstant)
+        .map(_.atEndOfMonth.atTime(23, 59, 59, 999999999).atZone(zone).toInstant)
         .map(earn(no, item, _))
         .reduceLeft { (script, command) => script.flatMap(_ => command) }
     }
@@ -160,7 +160,7 @@ object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
   override def updateState(state: Map[String, BudgetUnit], e: Event[_]): Map[String, BudgetUnit] = {
     log.trace(s"updating state: $state. Event: $e")
     e match {
-      case Registered(no, name, s, b) =>
+      case Registered(no, name, s, _) =>
         state + (no -> BudgetUnit(no, name, s.get))
       case Earned(no, amount, _, _) =>
         state.get(no) match {

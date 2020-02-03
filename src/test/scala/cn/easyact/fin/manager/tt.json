@@ -1,0 +1,22 @@
+{
+  "resource": "/budget-units",
+  "path": "/budget-units",
+  "httpMethod": "POST",
+  "headers": "{Accept=application/json, text/plain, */*, Accept-Encoding=gzip, deflate, br, Accept-Language=en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7, CloudFront-Forwarded-Proto=https, CloudFront-Is-Desktop-Viewer=false, CloudFront-Is-Mobile-Viewer=true, CloudFront-Is-SmartTV-Viewer=false, CloudFront-Is-Tablet-Viewer=false, CloudFront-Viewer-Country=CN, content-type=application/json, Host=mmi0rjvj8j.execute-api.ap-southeast-1.amazonaws.com, origin=http://localhost:4200, Referer=http://localhost:4200/, sec-fetch-mode=cors, sec-fetch-site=same-origin, User-Agent=Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1, Via=1.1 3326ced070f64c37ff4d732ed8d8fe38.cloudfront.net (CloudFront), X-Amz-Cf-Id=aTmVFly4gp_KNAqr7qVvAsgqQzrVgazf_281mAj2E_hsBWeya1tVdw==, X-Amzn-Trace-Id=Root=1-5e310af9-a365048075afffb8da2cf9f8, X-Forwarded-For=180.164.192.63, 70.132.19.152, X-Forwarded-Port=443, X-Forwarded-Proto=https}",
+  "multiValueHeaders": "{Accept=[application/json, text/plain, */*], Accept-Encoding=[gzip, deflate, br], Accept-Language=[en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7], CloudFront-Forwarded-Proto=[https], CloudFront-Is-Desktop-Viewer=[false], CloudFront-Is-Mobile-Viewer=[true], CloudFront-Is-SmartTV-Viewer=[false], CloudFront-Is-Tablet-Viewer=[false], CloudFront-Viewer-Country=[CN], content-type=[application/json], Host=[mmi0rjvj8j.execute-api.ap-southeast-1.amazonaws.com], origin=[http://localhost:4200], Referer=[http://localhost:4200/], sec-fetch-mode=[cors], sec-fetch-site=[same-origin], User-Agent=[Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1], Via=[1.1 3326ced070f64c37ff4d732ed8d8fe38.cloudfront.net (CloudFront)], X-Amz-Cf-Id=[aTmVFly4gp_KNAqr7qVvAsgqQzrVgazf_281mAj2E_hsBWeya1tVdw==], X-Amzn-Trace-Id=[Root=1-5e310af9-a365048075afffb8da2cf9f8], X-Forwarded-For=[180.164.192.63, 70.132.19.152], X-Forwarded-Port=[443], X-Forwarded-Proto=[https]}",
+  "requestContext": {
+    "accountId": 644386201194,
+    "resourceId": "p7gejp",
+    "stage": "dev",
+    "requestId": "35d213b0-9a03-4517-a144-1892c6769fdd",
+    "identity": "{sourceIp: 180.164.192.63, userAgent: Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1,}",
+    "resourcePath": "/budget-units",
+    "httpMethod": "POST",
+    "apiId": "mmi0rjvj8j",
+    "path": "/dev/budget-units"
+  },
+  "body": {
+    "name": "default"
+  },
+  "isBase64Encoded": false
+}
