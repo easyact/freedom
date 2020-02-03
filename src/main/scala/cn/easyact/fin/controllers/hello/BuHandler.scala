@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.scalalogging.Logger
 
+import scala.util.Try
+
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
   val logger: Logger = Logger[BuHandler]
@@ -28,7 +30,10 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
     logger.info(s"Received a request: $in")
     logger.info(s"getPathParameters: ${in.getPathParameters}")
+    Try(process(in)).map(writeValueAsString(_)).fold(BuResponse(500, _), BuResponse(200, _))
+  }
 
+  private def process(in: APIGatewayProxyRequestEvent) = {
     def post = {
       val sBu = in.getBody
       val dto = readValue(sBu, classOf[BU])
@@ -74,7 +79,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       case "POST" => post
       case "PUT" => items(in.getPathParameters)
     }
-    BuResponse(200, writeValueAsString(body))
+    body
   }
 }
 
