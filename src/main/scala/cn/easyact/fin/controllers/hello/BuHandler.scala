@@ -35,13 +35,9 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
 
   private def process(in: APIGatewayProxyRequestEvent) = {
     def post = {
-      val sBu = in.getBody
-      val dto = readValue(sBu, classOf[BU])
-      val name = dto.name
-      val id = randomUUID.toString
-      val script = register(id, name, Some(LocalDate now()))
-      val task = MemInterpreter(script)
-      task.unsafePerformSync
+      val dto = readValue(in.getBody, classOf[BU])
+      val cmd = register(randomUUID.toString, dto.name, Some(LocalDate.now))
+      MemInterpreter(cmd).unsafePerformSync
     }
 
     def get = allEvents.flatMap(snapshot).fold(
@@ -50,8 +46,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     )
 
     def items(p: util.Map[String, String]) = {
-      val sBu = in.getBody
-      val dto = readValue(sBu, classOf[Items])
+      val dto = readValue(in.getBody, classOf[Items])
       val no = p.get("no")
 
       val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
@@ -60,8 +55,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
         s >>= (_ => addItem(no, item))
       }
-      val task = MemInterpreter(script)
-      task.unsafePerformSync
+      MemInterpreter(script).unsafePerformSync
     }
 
     def forecast(p: util.Map[String, String]) =
