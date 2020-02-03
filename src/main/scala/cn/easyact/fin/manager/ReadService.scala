@@ -97,7 +97,7 @@ object MemReadService extends ReadService {
       val months = startMonth.until(endMonth, MONTHS)
       (0L to(months, item.intervalMonth))
         .map(startMonth.plusMonths)
-        .map(_.atDay(1).atStartOfDay(zone).toInstant)
+        .map(_.atEndOfMonth.atStartOfDay(zone).toInstant)
         .map(earn(no, item, _))
         .reduceLeft { (script, command) => script.flatMap(_ => command) }
     }
