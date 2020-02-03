@@ -18,15 +18,21 @@ case class BudgetUnit(no: String, name: String, start: LocalDate, balance: Amoun
 
 sealed trait BudgetItem {
   val id: UUID
-  val t: String
+  val name: String
   val amount: Amount
   val intervalMonth: Int
   val start: LocalDate
+
+  def getType: String
 }
 
-sealed trait Income extends BudgetItem
+sealed trait Income extends BudgetItem {
+  def getType = "Income"
+}
 
-sealed trait Expense extends BudgetItem
+sealed trait Expense extends BudgetItem {
+  def getType = "Expense"
+}
 
 trait Factory[T <: BudgetItem] {
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMM")
@@ -44,6 +50,7 @@ trait Factory[T <: BudgetItem] {
 
   def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T =
     apply(Option(id).map(UUID.fromString).getOrElse(randomUUID), t, amount, intervalMonth, start)
+
   def apply(id: UUID, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T
 }
 
@@ -57,7 +64,7 @@ object Income extends Factory[Income] {
 }
 
 object Expense extends Factory[Expense] {
-  def apply(id:UUID ,t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Expense = {
+  def apply(id: UUID, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): Expense = {
     t match {
       case _ => OtherExpense(id, amount, intervalMonth, start, t)
     }
@@ -65,9 +72,9 @@ object Expense extends Factory[Expense] {
 }
 
 case class Salary(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate) extends Income {
-  override val t: String = "工资"
+  override val name: String = "工资"
 }
 
-case class OtherIncome(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Income
+case class OtherIncome(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, name: String) extends Income
 
-case class OtherExpense(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, t: String) extends Expense
+case class OtherExpense(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, name: String) extends Expense
