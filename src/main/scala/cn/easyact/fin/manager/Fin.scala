@@ -48,8 +48,10 @@ trait Factory[T <: BudgetItem] {
   def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: YearMonth): T =
     apply(id, t, amount, intervalMonth, start.atEndOfMonth())
 
-  def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T =
-    apply(Option(id).map(_.trim).filterNot(_.isBlank).map(UUID.fromString).getOrElse(randomUUID), t, amount, intervalMonth, start)
+  def apply(id: String, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T = {
+    val uuid = Option(id).map(_.trim).filterNot(_.isBlank).map(UUID.fromString).getOrElse(randomUUID)
+    apply(uuid, t, amount, intervalMonth, start)
+  }
 
   def apply(id: UUID, t: String, amount: Amount, intervalMonth: Int, start: LocalDate): T
 }
