@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-events" % "2.2.7",
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.0",
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.1.0",
+  "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.716",
   "org.scalaz" %% "scalaz-concurrent" % "7.3.0-M27",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.10.1",
@@ -25,6 +26,7 @@ libraryDependencies += "org.assertj" % "assertj-core" % "3.14.0" % Test
 libraryDependencies += "org.specs2" %% "specs2-core" % "4.8.1" % Test
 //libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.0-alpha1"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
+//libraryDependencies += "com.gu" %% "scanamo" % "1.0.0-M8"
 
 scalacOptions ++= Seq(
   "-unchecked",

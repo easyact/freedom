@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, LocalTime, YearMonth}
 import java.util
 
+import cn.easyact.fin.manager.aws.DynamoDbInterpreter
 import io.cucumber.java.zh_cn.{假设, 当, 那么}
 import io.cucumber.java.{Before, _}
 import org.assertj.core.api.Assertions.assertThat
@@ -65,7 +66,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
     result = forecast(no, numberOfMonths)
   }
 
-  private def perform(script: Command[BudgetUnit]) = MemInterpreter(script).unsafePerformSync
+  private def perform(script: Command[BudgetUnit]) = DynamoDbInterpreter(script).unsafePerformSync
 
   @那么("生成预测:") def 生成预测(forecastList: util.List[MonthlyForecast]): Unit = {
     result.leftMap(assertThat(_).isNullOrEmpty())

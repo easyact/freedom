@@ -36,7 +36,6 @@ object MemReadService extends ReadService {
 
   import BudgetUnitCommands._
   import BudgetUnitSnapshot._
-  import MemInterpreter.eventLog._
 
   val log: Logger = Logger[ReadService]
 
@@ -45,7 +44,7 @@ object MemReadService extends ReadService {
     eventLog.clear()
     val startMonth = YearMonth.from(time.today)
     val endMonth = startMonth.plusMonths(numberOfMonths)
-    val eventList: Error \/ List[Event[_]] = events(no)
+    val eventList: Error \/ List[Event[_]] = MemInterpreter.eventLog.events(no)
     for {
       l <- eventList
       _ <- l.map(e => (e.at, randomUUID()) -> e).foreach { t =>
@@ -53,14 +52,6 @@ object MemReadService extends ReadService {
       }.right
     } yield ()
     log.debug("Added result: {}", eventLog)
-
-    //    eventList foreach {
-    //      _.map(e => (e.at, UUID.randomUUID()) -> e)
-    //        .foreach { t =>
-    //          eventLog.put(t._1, t._2)
-    //          log.info("Added result: ", eventLog)
-    //        }
-    //    }
 
     val bu: Error \/ BudgetUnit = for {
       l <- eventList
@@ -130,9 +121,7 @@ case class BudgetUnitCommands(ts: TimeService) {
 
 object BudgetUnitCommands extends BudgetUnitCommands(TimeService)
 
-object MemInterpreter extends Interpreter[BudgetUnit] {
-  val eventLog: EventStore[AggregateId] = MemEventStore.apply
-
+class StoreInterpreter(val eventLog: EventStore[AggregateId]) extends Interpreter[BudgetUnit] {
   import BudgetUnitSnapshot._
   import eventLog._
 
@@ -153,6 +142,8 @@ object MemInterpreter extends Interpreter[BudgetUnit] {
   }
 
 }
+
+object MemInterpreter extends StoreInterpreter(MemEventStore.apply)
 
 object BudgetUnitSnapshot extends Snapshot[BudgetUnit] {
   val log: Logger = Logger[Snapshot[BudgetUnit]]
