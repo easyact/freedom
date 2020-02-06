@@ -6,6 +6,13 @@ import java.util
 import java.util.UUID
 import java.util.UUID.randomUUID
 
+import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
+import com.fasterxml.jackson.databind.annotation.{JsonDeserialize, JsonSerialize}
+import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonNode, JsonSerializer, SerializerProvider}
+import com.typesafe.scalalogging.Logger
+
+import scala.collection.JavaConverters._
+
 case class MonthlyForecast(month: YearMonth, balance: Amount)
 
 object MonthlyForecast {
@@ -16,6 +23,8 @@ object MonthlyForecast {
 case class BudgetUnit(no: String, name: String, start: LocalDate, balance: Amount = 0,
                       budgetItems: List[BudgetItem] = List.empty) extends Aggregate
 
+@JsonDeserialize(using = classOf[BudgetItemDeserializer])
+@JsonSerialize(using = classOf[BudgetItemSerializer])
 sealed trait BudgetItem {
   val id: UUID
   val name: String
@@ -80,3 +89,22 @@ case class Salary(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate
 case class OtherIncome(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, name: String) extends Income
 
 case class OtherExpense(id: UUID, amount: Amount, intervalMonth: Int, start: LocalDate, name: String) extends Expense
+
+class BudgetItemDeserializer extends JsonDeserializer[BudgetItem] {
+  private val log: Logger = Logger[BudgetItemDeserializer]
+
+  override def deserialize(p: JsonParser, ctxt: DeserializationContext): BudgetItem = {
+    val node: JsonNode = p.getCodec.readTree(p)
+    val textNode = node.get("dtype")
+    log.debug(s"Desering $textNode: $node")
+    val clz = Class.forName(textNode.toString)
+    p.readValueAs(clz).asInstanceOf
+  }
+}
+
+class BudgetItemSerializer extends JsonSerializer[BudgetItem] {
+  override def serialize(value: BudgetItem, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
+    gen.writeStringField("dtype", value.getType)
+    gen.writeObject(value)
+  }
+}
