@@ -4,7 +4,7 @@ import cn.easyact.fin.manager.{Error, Event, EventStore, ReadService, StoreInter
 import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item, ItemCollection, QueryOutcome}
 import com.amazonaws.services.dynamodbv2.document.spec.{DeleteItemSpec, QuerySpec, ScanSpec}
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
 import scalaz._
 import Scalaz._
 import com.typesafe.scalalogging.Logger
@@ -26,6 +26,7 @@ object DynamoDbEventStore {
   private val table = dynamoDB.getTable("freedomEvents")
 
   val mapper = new ObjectMapper with ScalaObjectMapper
+  mapper.registerModule(DefaultScalaModule)
 
   def apply[K]: EventStore[K] = new EventStore[K] {
     override def clear(): Unit = table.deleteItem(new DeleteItemSpec)
@@ -37,9 +38,11 @@ object DynamoDbEventStore {
 
     override def put(key: K, event: Event[_]): Error \/ Event[_] = {
       val className = event.getClass.getName
-      log.debug(s"putting $key: $event, using clasName: $className")
+      val json = mapper.writeValueAsString(event)
+      log.debug(s"putting $key: $json, using clasName: $className")
       table.putItem {
-        new Item().withPrimaryKey("no", event.no)
+        Item.fromJSON(json)
+          .withPrimaryKey("no", event.no)
           .withKeyComponent("at", event.at.toString)
           .withString("dtype", className)
       }
