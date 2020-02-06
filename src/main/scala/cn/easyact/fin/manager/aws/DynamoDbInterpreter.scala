@@ -3,10 +3,11 @@ package cn.easyact.fin.manager.aws
 import cn.easyact.fin.manager.{Error, Event, EventStore, ReadService, StoreInterpreter}
 import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item, ItemCollection, QueryOutcome}
 import com.amazonaws.services.dynamodbv2.document.spec.{DeleteItemSpec, QuerySpec, ScanSpec}
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
 import scalaz._
 import Scalaz._
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.typesafe.scalalogging.Logger
 
 import scala.collection.JavaConverters._
@@ -27,6 +28,8 @@ object DynamoDbEventStore {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
+  mapper.registerModule(new JavaTimeModule)
+  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
 
   def apply[K]: EventStore[K] = new EventStore[K] {
     override def clear(): Unit = table.deleteItem(new DeleteItemSpec)
@@ -54,10 +57,10 @@ object DynamoDbEventStore {
     }
   }
 
-  private def toEvent[K]: Item => Event[_] = {
+  private def toEvent[K] = {
     item: Item =>
       val clazz = Class.forName(s"${item.get("dtype")}")
-      mapper.readerFor(clazz).readValue(item.toJSON)
+      mapper.readerFor(clazz).readValue(item.toJSON).asInstanceOf[Event[_]]
   }
 }
 

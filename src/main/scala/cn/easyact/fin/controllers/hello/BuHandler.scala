@@ -9,6 +9,7 @@ import cn.easyact.fin.manager.{BudgetUnit, BudgetUnitSnapshot, Command, Expense,
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.scalalogging.Logger
 
@@ -20,6 +21,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
 
   val mapper = new ObjectMapper //with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
+  mapper.registerModule(new JavaTimeModule)
 
   import BudgetUnitSnapshot._
   import cn.easyact.fin.manager.MemInterpreter.eventLog._

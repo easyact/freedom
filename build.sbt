@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-concurrent" % "7.3.0-M27",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.10.1",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.1",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.10.2"
 )
 
