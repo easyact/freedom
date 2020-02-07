@@ -16,12 +16,12 @@ import scalaz._
 
 import scala.collection.JavaConverters._
 
-object DynamoDbEventStore {
-  val log: Logger = Logger[DynamoDbEventStore.type]
-//  implicit val store =
+class DynamoDbEventStore(url: String = "http://localhost:8000") {
+  val log: Logger = Logger[DynamoDbEventStore]
+  //  implicit val store =
 
   val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder.standard.withEndpointConfiguration(
-    new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "ap-southeast-1")).build
+    new AwsClientBuilder.EndpointConfiguration(url, "ap-southeast-1")).build
 
   val dynamoDB = new DynamoDB(client)
 
@@ -56,16 +56,15 @@ object DynamoDbEventStore {
       \/-(event)
     }
 
-    override def allEvents: Error \/ List[Event[_]] = {
-      table.scan(new ScanSpec).asScala.map(toEvent).toList.right
-    }
+    override def allEvents: Error \/ List[Event[_]] = table.scan(new ScanSpec).asScala.map(toEvent).toList.right
   }
 
-  private def toEvent[K] = {
-    item: Item =>
-      val clazz = Class.forName(s"${item.get("dtype")}")
-      mapper.readerFor(clazz).readValue(item.toJSON).asInstanceOf[Event[_]]
+  private def toEvent[K] = { item: Item =>
+    val clazz = Class.forName(s"${item.get("dtype")}")
+    mapper.readerFor(clazz).readValue(item.toJSON).asInstanceOf[Event[_]]
   }
 }
+
+object DynamoDbEventStore extends DynamoDbEventStore(Option(System.getenv("EVENT_STORE_URL")).getOrElse("http://localhost:8000"))
 
 object DynamoDbInterpreter extends StoreInterpreter(DynamoDbEventStore.apply)
