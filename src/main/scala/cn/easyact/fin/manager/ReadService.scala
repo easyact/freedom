@@ -35,7 +35,7 @@ trait ReadService {
   : Error \/ List[MonthlyForecast]
 }
 
-object MemReadService extends ReadService {
+object ReadService extends ReadService {
 
   import BudgetUnitCommands._
   import BudgetUnitSnapshot._
@@ -43,7 +43,8 @@ object MemReadService extends ReadService {
   val log: Logger = Logger[ReadService]
 
   override def forecast(no: AggregateId, numberOfMonths: Int)
-                       (implicit time: TimeService = TimeService, store: EventStore[AggregateId] = MemInterpreter.eventLog): Error \/ List[MonthlyForecast] = {
+                       (implicit time: TimeService = TimeService,
+                        store: EventStore[AggregateId] = MemInterpreter.eventLog): Error \/ List[MonthlyForecast] = {
     import SimulateInterpreter.eventLog
     eventLog.clear()
     val startMonth = YearMonth.from(time.today)

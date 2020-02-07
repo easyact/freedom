@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{BudgetUnit, BudgetUnitSnapshot, Command, Expense, Income, MemInterpreter, MemReadService, TimeService}
+import cn.easyact.fin.manager.{BudgetUnit, BudgetUnitSnapshot, Command, Expense, Income, MemInterpreter, ReadService, TimeService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -59,7 +59,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     }
 
     def forecast(p: util.Map[String, String]) =
-      MemReadService.forecast(p.get("no"), p.get("count").toInt).fold(
+      ReadService.forecast(p.get("no"), p.get("count").toInt).fold(
         e => throw new RuntimeException(e),
         r => r
       )

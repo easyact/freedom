@@ -27,7 +27,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
 
   import time._
 
-  import MemReadService._
+  import ReadService._
 
   private var result: Error \/ List[MonthlyForecast] = _
   //  private var script: Free[Event, BudgetUnit] = _
