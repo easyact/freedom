@@ -1,23 +1,23 @@
 package cn.easyact.fin.manager.aws
 
-import cn.easyact.fin.manager.{Error, Event, EventStore, ReadService, StoreInterpreter}
-import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item, ItemCollection, QueryOutcome}
+import cn.easyact.fin.manager.{Error, Event, EventStore, StoreInterpreter}
+import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.dynamodbv2.document.spec.{DeleteItemSpec, QuerySpec, ScanSpec}
+import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
-import scalaz._
-import Scalaz._
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.scala.{DefaultScalaModule, ScalaObjectMapper}
 import com.typesafe.scalalogging.Logger
+import scalaz.Scalaz._
+import scalaz._
 
 import scala.collection.JavaConverters._
 
 object DynamoDbEventStore {
   val log: Logger = Logger[DynamoDbEventStore.type]
-
-  import com.amazonaws.client.builder.AwsClientBuilder
-  import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-  import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
 
   val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder.standard.withEndpointConfiguration(
     new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "ap-southeast-1")).build
@@ -29,7 +29,8 @@ object DynamoDbEventStore {
   val mapper = new ObjectMapper with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
   mapper.registerModule(new JavaTimeModule)
-  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  mapper.activateDefaultTypingAsProperty(BasicPolymorphicTypeValidator.builder().build(), DefaultTyping.NON_FINAL, "dtype")
 
   def apply[K]: EventStore[K] = new EventStore[K] {
     override def clear(): Unit = table.deleteItem(new DeleteItemSpec)
