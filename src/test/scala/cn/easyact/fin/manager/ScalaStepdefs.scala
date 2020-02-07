@@ -22,7 +22,7 @@ object MockTimeService extends TimeService {
 
 class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
   implicit val time: TimeService = MockTimeService
-  val interpreter: StoreInterpreter = DynamoDbInterpreter
+  val interpreter: StoreInterpreter = MemInterpreter//DynamoDbInterpreter
   implicit val store: EventStore[String] = interpreter.eventLog
 
   import time._
