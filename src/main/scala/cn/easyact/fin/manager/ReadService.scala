@@ -30,7 +30,9 @@ case class ItemAdded(no: String, income: BudgetItem, at: Instant = now) extends 
 case class Earned(no: String, amount: Amount, budgetItem: Option[BudgetItem] = None, at: Instant = now) extends IncomeEvent
 
 trait ReadService {
-  def forecast(no: AggregateId, numberOfMonths: Int)(implicit time: TimeService): Error \/ List[MonthlyForecast]
+  def forecast(no: AggregateId, numberOfMonths: Int)
+              (implicit time: TimeService, store: EventStore[AggregateId] = MemInterpreter.eventLog)
+  : Error \/ List[MonthlyForecast]
 }
 
 object MemReadService extends ReadService {
@@ -41,7 +43,7 @@ object MemReadService extends ReadService {
   val log: Logger = Logger[ReadService]
 
   override def forecast(no: AggregateId, numberOfMonths: Int)
-                       (implicit time: TimeService = TimeService): Error \/ List[MonthlyForecast] = {
+                       (implicit time: TimeService = TimeService, store: EventStore[AggregateId] = MemInterpreter.eventLog): Error \/ List[MonthlyForecast] = {
     import SimulateInterpreter.eventLog
     eventLog.clear()
     val startMonth = YearMonth.from(time.today)
