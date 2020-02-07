@@ -48,10 +48,7 @@ object MemReadService extends ReadService {
     eventLog.clear()
     val startMonth = YearMonth.from(time.today)
     val endMonth = startMonth.plusMonths(numberOfMonths)
-    val store =
-    //      implicitly[EventStore[AggregateId]]
-    //      MemInterpreter.eventLog
-      DynamoDbInterpreter.eventLog
+    log.trace(s"Store is ${store.getClass}. TimeService is ${time.getClass}")
     val eventList: Error \/ List[Event[_]] = store.events(no)
     for {
       l <- eventList

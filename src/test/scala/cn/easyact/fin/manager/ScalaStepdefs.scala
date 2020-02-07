@@ -22,8 +22,11 @@ object MockTimeService extends TimeService {
 
 class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
   implicit val time: TimeService = MockTimeService
+  val interpreter: StoreInterpreter = DynamoDbInterpreter
+  implicit val store: EventStore[String] = interpreter.eventLog
 
   import time._
+
   import MemReadService._
 
   private var result: Error \/ List[MonthlyForecast] = _
@@ -66,7 +69,7 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
     result = forecast(no, numberOfMonths)
   }
 
-  private def perform(script: Command[BudgetUnit]) = DynamoDbInterpreter(script).unsafePerformSync
+  private def perform(script: Command[BudgetUnit]) = interpreter(script).unsafePerformSync
 
   @那么("生成预测:") def 生成预测(forecastList: util.List[MonthlyForecast]): Unit = {
     result.leftMap(assertThat(_).isNullOrEmpty())
