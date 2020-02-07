@@ -18,6 +18,7 @@ import scala.collection.JavaConverters._
 
 object DynamoDbEventStore {
   val log: Logger = Logger[DynamoDbEventStore.type]
+//  implicit val store =
 
   val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder.standard.withEndpointConfiguration(
     new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "ap-southeast-1")).build
@@ -37,7 +38,9 @@ object DynamoDbEventStore {
 
     override def get(key: K): List[Event[_]] = {
       val spec = new QuerySpec().withHashKey("no", key)
-      table.query(spec).asScala.map(toEvent).toList
+      val r = table.query(spec).asScala.map(toEvent).toList
+      log.debug(s"Qureying: ${spec.getHashKey}; Return: $r")
+      r
     }
 
     override def put(key: K, event: Event[_]): Error \/ Event[_] = {

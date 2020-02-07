@@ -27,8 +27,6 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   import cn.easyact.fin.manager.MemInterpreter.eventLog._
   import mapper._
 
-  implicit val timeService: TimeService = TimeService
-
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
     logger.info(s"Received a request: $in")
     logger.info(s"getPathParameters: ${in.getPathParameters}")

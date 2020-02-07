@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit.MONTHS
 import java.util.UUID
 import java.util.UUID.randomUUID
 
+import cn.easyact.fin.manager.aws.{DynamoDbEventStore, DynamoDbInterpreter}
 import com.typesafe.scalalogging.Logger
 import scalaz.Scalaz._
 import scalaz._
@@ -39,12 +40,17 @@ object MemReadService extends ReadService {
 
   val log: Logger = Logger[ReadService]
 
-  override def forecast(no: AggregateId, numberOfMonths: Int)(implicit time: TimeService): Error \/ List[MonthlyForecast] = {
+  override def forecast(no: AggregateId, numberOfMonths: Int)
+                       (implicit time: TimeService = TimeService): Error \/ List[MonthlyForecast] = {
     import SimulateInterpreter.eventLog
     eventLog.clear()
     val startMonth = YearMonth.from(time.today)
     val endMonth = startMonth.plusMonths(numberOfMonths)
-    val eventList: Error \/ List[Event[_]] = MemInterpreter.eventLog.events(no)
+    val store =
+    //      implicitly[EventStore[AggregateId]]
+    //      MemInterpreter.eventLog
+      DynamoDbInterpreter.eventLog
+    val eventList: Error \/ List[Event[_]] = store.events(no)
     for {
       l <- eventList
       _ <- l.map(e => (e.at, randomUUID()) -> e).foreach { t =>
@@ -122,6 +128,7 @@ case class BudgetUnitCommands(ts: TimeService) {
 object BudgetUnitCommands extends BudgetUnitCommands(TimeService)
 
 class StoreInterpreter(val eventLog: EventStore[AggregateId]) extends Interpreter[BudgetUnit] {
+
   import BudgetUnitSnapshot._
   import eventLog._
 
