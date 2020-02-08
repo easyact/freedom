@@ -1,8 +1,8 @@
 provider "aws" {
   region = "ap-southeast-1"
-  endpoints {
-    dynamodb = "http://localhost:8000"
-  }
+//  endpoints {
+//    dynamodb = "http://localhost:8000"
+//  }
 }
 resource "aws_dynamodb_table" "events" {
   hash_key = "no"
