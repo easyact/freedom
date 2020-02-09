@@ -20,3 +20,10 @@ resource "aws_dynamodb_table" "events" {
   read_capacity = 1
   write_capacity = 1
 }
+
+output "dns" {
+  value = {
+    arn = aws_dynamodb_table.events.arn
+    name = aws_dynamodb_table.events.name
+  }
+}
