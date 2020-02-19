@@ -3,6 +3,7 @@ provider "aws" {
 //  endpoints {
 //    dynamodb = "http://localhost:8000"
 //  }
+  profile = "ea"
 }
 resource "aws_dynamodb_table" "events" {
   hash_key = "no"
@@ -21,7 +22,7 @@ resource "aws_dynamodb_table" "events" {
   write_capacity = 1
 }
 
-output "dns" {
+output "ddb" {
   value = {
     arn = aws_dynamodb_table.events.arn
     name = aws_dynamodb_table.events.name
