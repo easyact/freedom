@@ -3,7 +3,7 @@ provider "aws" {
 //  endpoints {
 //    dynamodb = "http://localhost:8000"
 //  }
-  profile = "ea"
+//  profile = "ea"
 }
 resource "aws_dynamodb_table" "events" {
   hash_key = "no"
