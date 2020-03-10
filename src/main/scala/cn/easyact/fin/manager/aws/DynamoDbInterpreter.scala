@@ -16,12 +16,16 @@ import scalaz._
 
 import scala.collection.JavaConverters._
 
-class DynamoDbEventStore(url: String = "http://localhost:8000") {
+class DynamoDbEventStore(debug: Boolean = false) {
   val log: Logger = Logger[DynamoDbEventStore]
   //  implicit val store =
 
-  val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder.standard.withEndpointConfiguration(
-    new AwsClientBuilder.EndpointConfiguration(url, "ap-southeast-1")).build
+  val client: AmazonDynamoDB = if (debug)
+    AmazonDynamoDBClientBuilder.standard.withEndpointConfiguration(
+      new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "ap-southeast-1"))
+      .build
+  else
+    AmazonDynamoDBClientBuilder.standard.build
 
   val dynamoDB = new DynamoDB(client)
 
@@ -65,6 +69,6 @@ class DynamoDbEventStore(url: String = "http://localhost:8000") {
   }
 }
 
-object DynamoDbEventStore extends DynamoDbEventStore(Option(System.getenv("EVENT_STORE_URL")).getOrElse("http://localhost:8000"))
+object DynamoDbEventStore extends DynamoDbEventStore(System.getenv("DEBUG") == "true")
 
 object DynamoDbInterpreter extends StoreInterpreter(DynamoDbEventStore.apply)

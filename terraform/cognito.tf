@@ -34,7 +34,7 @@ output "cognito" {
     url = {for k, v in local.callbacks : k=>{
       code = "${local.domain}/login?response_type=code&scope=openid&client_id=${aws_cognito_user_pool_client.clients[k].id}&redirect_uri=${aws_cognito_user_pool_client.clients[k].callback_urls[0]}"
       implicit = "${local.domain}/login?response_type=token&scope=openid&client_id=${aws_cognito_user_pool_client.clients[k].id}&redirect_uri=${aws_cognito_user_pool_client.clients[k].callback_urls[0]}"
-      client_id = aws_cognito_user_pool_client.clients[k]
+      client_id = aws_cognito_user_pool_client.clients[k].id
     }}
   }
 }

@@ -23,8 +23,5 @@ resource "aws_dynamodb_table" "events" {
 }
 
 output "ddb" {
-  value = {
-    arn = aws_dynamodb_table.events.arn
-    name = aws_dynamodb_table.events.name
-  }
+  value = aws_dynamodb_table.events
 }
