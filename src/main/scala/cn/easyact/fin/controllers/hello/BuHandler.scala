@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{BudgetUnit, BudgetUnitSnapshot, Command, Expense, Income, MemInterpreter, ReadService, TimeService}
+import cn.easyact.fin.manager.{AggregateId, BudgetUnit, BudgetUnitSnapshot, Command, EventStore, Expense, Income, MemInterpreter, ReadService, TimeService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -24,7 +24,9 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   mapper.registerModule(new JavaTimeModule)
 
   import BudgetUnitSnapshot._
-  import cn.easyact.fin.manager.MemInterpreter.eventLog._
+  import cn.easyact.fin.manager.MemInterpreter._
+  implicit val events: EventStore[AggregateId] = eventLog
+
   import mapper._
 
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
@@ -37,10 +39,10 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     def post = {
       val dto = readValue(in.getBody, classOf[BU])
       val cmd = register(randomUUID.toString, dto.name, Some(LocalDate.now))
-      MemInterpreter(cmd).unsafePerformSync
+      apply(cmd).unsafePerformSync
     }
 
-    def get = allEvents.flatMap(snapshot).fold(
+    def get = events.allEvents.flatMap(snapshot).fold(
       err => throw new RuntimeException(err),
       m => m
     )
@@ -55,7 +57,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
         s >>= (_ => addItem(no, item))
       }
-      MemInterpreter(script).unsafePerformSync
+      apply(script).unsafePerformSync
     }
 
     def forecast(p: util.Map[String, String]) =
