@@ -60,6 +60,8 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       apply(script).unsafePerformSync
     }
 
+    def items(no: String) = BudgetUnitSnapshot.snapshot()
+
     def forecast(p: util.Map[String, String]) =
       ReadService.forecast(p.get("no"), p.get("count").toInt).fold(
         e => throw new RuntimeException(e),

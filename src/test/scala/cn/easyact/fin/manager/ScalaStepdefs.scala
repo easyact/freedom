@@ -4,11 +4,10 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate, LocalTime, YearMonth}
 import java.util
 
-import cn.easyact.fin.manager.aws.DynamoDbInterpreter
 import io.cucumber.java.zh_cn.{假设, 当, 那么}
 import io.cucumber.java.{Before, _}
 import org.assertj.core.api.Assertions.assertThat
-import scalaz.{Free, \/}
+import scalaz.\/
 
 import scala.collection.JavaConverters._
 
@@ -27,9 +26,8 @@ class ScalaStepdefs extends BudgetUnitCommands(MockTimeService) {
 //    DynamoDbInterpreter
   implicit val store: EventStore[String] = interpreter.eventLog
 
-  import time._
-
   import ReadService._
+  import time._
 
   private var result: Error \/ List[MonthlyForecast] = _
   //  private var script: Free[Event, BudgetUnit] = _
