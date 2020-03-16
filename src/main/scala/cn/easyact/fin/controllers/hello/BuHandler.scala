@@ -13,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.typesafe.scalalogging.Logger
 
+import scala.collection.Set
 import scala.util.Try
 
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
@@ -25,6 +26,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
 
   import BudgetUnitSnapshot._
   import cn.easyact.fin.manager.MemInterpreter._
+
   implicit val events: EventStore[AggregateId] = eventLog
 
   import mapper._
@@ -60,7 +62,10 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       apply(script).unsafePerformSync
     }
 
-    def items(no: String) = BudgetUnitSnapshot.snapshot()
+    def itemsByNo(no: String) = for {
+      es <- events.events(no)
+      bUs <- snapshot(es)
+    } yield bUs(no)
 
     def forecast(p: util.Map[String, String]) =
       ReadService.forecast(p.get("no"), p.get("count").toInt).fold(
@@ -69,16 +74,17 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       )
 
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "INFO")
-    val body = in.getHttpMethod match {
-      case "GET" => in.getPathParameters match {
-        case null => get
-        case p => forecast(p)
+    in.getHttpMethod match {
+      case "GET" => in.getPathParameters.keySet match {
+        case p if p.isEmpty => get
+        case p if p.contains("unit") => forecast(in.getPathParameters)
+        case _ => itemsByNo(in.getPathParameters.get("no"))
       }
       case "POST" => post
       case "PUT" => items(in.getPathParameters)
     }
-    body
   }
+
 }
 
 case class ForecastParams(no: String, unit: String, count: Int)

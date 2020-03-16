@@ -65,6 +65,14 @@ functions:
       - http:
           cors: true
           path: /budget-units/{no}/items
+          method: get
+          request:
+            parameters:
+              paths:
+                no: true
+      - http:
+          cors: true
+          path: /budget-units/{no}/items
           method: put
           request:
             parameters:
