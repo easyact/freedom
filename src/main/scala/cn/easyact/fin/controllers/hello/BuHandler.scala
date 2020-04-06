@@ -36,7 +36,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   }
 
   private def process(in: APIGatewayProxyRequestEvent) = {
-    def post = {
+    def budgetUnit = {
       val dto = readValue(in.getBody, classOf[BU])
       val cmd = register(randomUUID.toString, dto.name, Some(LocalDate.now))
       apply(cmd).unsafePerformSync
@@ -60,7 +60,10 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       apply(script).unsafePerformSync
     }
 
-    def items(no: String) = BudgetUnitSnapshot.snapshot()
+    def getItems(no: String) = for {
+      l <- events.events(no)
+      s <- snapshot(l)
+    } s(no)
 
     def forecast(p: util.Map[String, String]) =
       ReadService.forecast(p.get("no"), p.get("count").toInt).fold(
@@ -71,10 +74,11 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "INFO")
     val body = in.getHttpMethod match {
       case "GET" => in.getPathParameters match {
+        case params if in.getPath.matches("/budget-units/.*/forecast.*") => forecast(params)
+        case params if in.getPath.matches("/budget-units/.*/items") => getItems(params.get("no"))
         case null => get
-        case p => forecast(p)
       }
-      case "POST" => post
+      case "POST" => budgetUnit
       case "PUT" => items(in.getPathParameters)
     }
     body
