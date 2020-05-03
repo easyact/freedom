@@ -1,6 +1,6 @@
 package cn.easyact.fin.controllers.hello
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 import java.util
 import java.util.UUID.randomUUID
 
@@ -60,14 +60,28 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     def items(p: util.Map[String, String]) = {
       val dto = readValue(in.getBody, classOf[Items])
       val no = p.get("no")
+      for {
+        l <- events.events(no)
+        snapshot <- snapshot(l)
+        script: Command[BudgetUnit] <- snapshot.get(no).fold(
+          () => register(no, no, Some(LocalDate.now()), Instant.now()),
+          Free.pure
+        ).right
+        incomeScript <- dto.incomes.map(Income(_)).map(addItem(no, _)).foldLeft(script) { (s, s1) =>
+          s.flatMap(_ => s1)
+        }.right
+        scripts <- dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
+          s >>= (_ => addItem(no, item))
+        }.right
+      } yield apply(scripts).unsafePerformSync
 
-      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
-        s.flatMap(_ => s1)
-      }
-      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
-        s >>= (_ => addItem(no, item))
-      }
-      apply(script).unsafePerformSync.right[Error]
+      //      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
+      //        s.flatMap(_ => s1)
+      //      }
+      //      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
+      //        s >>= (_ => addItem(no, item))
+      //      }
+      //      apply(script).unsafePerformSync.right[Error]
     }
 
     def getItems(no: String) = for {
