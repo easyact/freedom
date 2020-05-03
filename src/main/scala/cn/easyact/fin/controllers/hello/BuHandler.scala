@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID.randomUUID
 
 import cn.easyact.fin.manager.BudgetUnitCommands._
-import cn.easyact.fin.manager.{AggregateId, BudgetUnit, BudgetUnitSnapshot, Command, Error, EventStore, Expense, Income, ReadService}
+import cn.easyact.fin.manager.{AggregateId, BudgetUnit, BudgetUnitSnapshot, Command, Error, Event, EventStore, Expense, Income, ReadService}
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -60,28 +60,17 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     def items(p: util.Map[String, String]) = {
       val dto = readValue(in.getBody, classOf[Items])
       val no = p.get("no")
-      for {
-        l <- events.events(no)
-        snapshot <- snapshot(l)
-        script: Command[BudgetUnit] <- snapshot.get(no).fold(
-          () => register(no, no, Some(LocalDate.now()), Instant.now()),
-          Free.pure
-        ).right
-        incomeScript <- dto.incomes.map(Income(_)).map(addItem(no, _)).foldLeft(script) { (s, s1) =>
-          s.flatMap(_ => s1)
-        }.right
-        scripts <- dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
-          s >>= (_ => addItem(no, item))
-        }.right
-      } yield apply(scripts).unsafePerformSync
+      val initScript: Command[BudgetUnit] = getItems(no).fold(
+        _ => register(no, no, Some(LocalDate.now), Instant.now),
+        Free.pure)
 
-      //      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).reduceLeft[Command[BudgetUnit]] { (s, s1) =>
-      //        s.flatMap(_ => s1)
-      //      }
-      //      val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
-      //        s >>= (_ => addItem(no, item))
-      //      }
-      //      apply(script).unsafePerformSync.right[Error]
+      val incomeScript = dto.incomes.map(Income(_)).map(addItem(no, _)).foldLeft(initScript) { (script, command) =>
+        script.flatMap(_ => command)
+      }
+      val script = dto.expenses.map(Expense(_)).map(addItem(no, _)).foldLeft(incomeScript) { (script, command) =>
+        script.flatMap(_ => command)
+      }
+      apply(script).unsafePerformSync.right[Error]
     }
 
     def getItems(no: String) = for {
