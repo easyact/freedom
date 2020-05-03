@@ -66,7 +66,8 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     def getItems(no: String) = for {
       l <- events.events(no)
       s <- snapshot(l)
-    } yield s(no)
+      u <- s.get(no)
+    } yield u
 
     def forecast(p: util.Map[String, String]) =
       ReadService.forecast(p.get("no"), p.get("count").toInt)
