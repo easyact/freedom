@@ -15,6 +15,8 @@ import com.typesafe.scalalogging.Logger
 import scalaz.Scalaz._
 import scalaz._
 
+import scala.language.implicitConversions
+
 class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] {
 
   val logger: Logger = Logger[BuHandler]
