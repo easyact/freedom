@@ -35,10 +35,15 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   def handleRequest(in: APIGatewayProxyRequestEvent, context: Context): BuResponse = {
     logger.info(s"Received a request: $in")
     logger.info(s"getPathParameters: ${in.getPathParameters}")
+
+    def resp(code: Int, e: Error) = BuResponse(code, new {
+      val message: Error = e
+    })
+
     process(in).map(writeValueAsString).fold(
       {
-        case e@"Not found" => BuResponse(404, writeValueAsString(e))
-        case e => BuResponse(500, writeValueAsString(e))
+        case e@"Not found" => resp(404, e)
+        case e => resp(500, e)
       },
       BuResponse(200, _))
   }
@@ -62,7 +67,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
       val script = dto.expenses.map(Expense(_)).foldLeft(incomeScript) { (s, item) =>
         s >>= (_ => addItem(no, item))
       }
-      apply(script).unsafePerformSync.right
+      apply(script).unsafePerformSync.right[Error]
     }
 
     def getItems(no: String) = for {
