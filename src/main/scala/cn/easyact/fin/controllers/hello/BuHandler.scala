@@ -36,9 +36,9 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
     logger.info(s"Received a request: $in")
     logger.info(s"getPathParameters: ${in.getPathParameters}")
 
-    def resp(code: Int, e: Error) = BuResponse(code, new {
+    def resp(code: Int, e: Error) = BuResponse(code, writeValueAsString(new {
       val message: Error = e
-    })
+    }))
 
     process(in).map(writeValueAsString).fold(
       {
