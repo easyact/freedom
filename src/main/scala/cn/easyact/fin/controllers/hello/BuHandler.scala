@@ -26,7 +26,7 @@ class BuHandler extends RequestHandler[APIGatewayProxyRequestEvent, BuResponse] 
   mapper.registerModule(new JavaTimeModule)
 
   import BudgetUnitSnapshot._
-  import cn.easyact.fin.manager.MemInterpreter._
+  import cn.easyact.fin.manager.aws.DynamoDbInterpreter._
 
   implicit val events: EventStore[AggregateId] = eventLog
 
